@@ -1,13 +1,15 @@
 import get_var as gav
 from create_objects import get_spark_object
-from validations import get_curr_date
+from validations import get_curr_date, df_count, df_top10_rec
 import sys
 import logging
 import logging.config
 import os
+from data_ingest import load_files
 
 #Loading the logging configuration file
 logging.config.fileConfig(fname='../util/logging_to_file.conf')
+print("Testing git connection")
 
 def main():
 
@@ -33,6 +35,13 @@ def main():
                 file_format = 'parquet'
                 header = 'NA'
                 inferSchema = 'NA'
+
+        df_city = load_files(spark, file_dir, file_format, header, inferSchema)
+
+        #Validate data_ingest script for city dimension data frame
+        df_count(df_city,"df_city")
+        df_top10_rec(df_city,"df_city")
+
 
         logging.info("run_pipeline.py is Completed")
 

@@ -1,5 +1,6 @@
 import logging
 import logging.config
+#import pandas
 
 #Load the logging config file and create a customer logger for current module
 logging.config.fileConfig(fname='../util/logging_to_file.conf')
@@ -23,3 +24,28 @@ def get_curr_date(spark):
     #Executed when there are no exceptions in the code
     else:
         logger.info("Spark object is validated.")
+
+def df_count(df,dfName):
+    try:
+        logger.info(f"df_count() started for data frame {dfName}...")
+        df_count=df.count()
+        logger.info(f"The data frame count is {df_count}")
+
+    except Exception as exp:
+        logger.error("Error in df_count(): "+ str(exp))
+        raise
+
+    else:
+        logger.info(f"Dataframe validation by count is completed.")
+
+def df_top10_rec(df,dfName):
+    try:
+        logger.info(f"df_top10_rec() started for data frame {dfName}... ")
+        logger.info("Top 10 records are: ")
+        df_pandas = df.limit(10).toPandas()
+        logger.info('\n \t'+df_pandas.to_string(index=False))
+    except Exception as exp:
+        logger.error("Error in df_top10_rec(): "+str(exp))
+        raise
+    else:
+        logger.info("Data frame validation by top 10 records completed.")
