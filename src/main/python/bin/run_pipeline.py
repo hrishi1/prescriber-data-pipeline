@@ -1,15 +1,15 @@
 import get_var as gav
 from create_objects import get_spark_object
-from validations import get_curr_date, df_count, df_top10_rec
+from validations import get_curr_date, df_count, df_top10_rec, df_print_schema
 import sys
 import logging
 import logging.config
 import os
 from data_ingest import load_files
+from data_preprocessing import perform_data_clean
 
 #Loading the logging configuration file
 logging.config.fileConfig(fname='../util/logging_to_file.conf')
-print("Testing git connection")
 
 def main():
 
@@ -23,9 +23,7 @@ def main():
         #Initiate data_ingest script
         #Load the City file
         for file in os.listdir(gav.staging_dim_city):
-            print("File is: "+file)
             file_dir = gav.staging_dim_city + '\\' + file
-            print(file_dir)
 
             if file.split('.')[1] == 'csv':
                 file_format = 'csv'
@@ -38,10 +36,38 @@ def main():
 
         df_city = load_files(spark, file_dir, file_format, header, inferSchema)
 
-        #Validate data_ingest script for city dimension data frame
+        #Load the Prescriber Fact file
+        for file in os.listdir(gav.staging_fact):
+            print("File is: "+file)
+            file_dir = gav.staging_fact + '\\' + file
+            print(file_dir)
+
+            if file.split('.')[1] == 'csv':
+                file_format = 'csv'
+                header = gav.header
+                inferSchema = gav.inferSchema
+            elif file.split('.')[1] == 'parquet':
+                file_format = 'parquet'
+                header = 'NA'
+                inferSchema = 'NA'
+
+        df_fact = load_files(spark, file_dir, file_format, header, inferSchema)
+
+        #Validate data_ingest script for city dimension and prescriber fact data frame
         df_count(df_city,"df_city")
         df_top10_rec(df_city,"df_city")
 
+        df_count(df_fact, "df_fact")
+        df_top10_rec(df_fact, "df_fact")
+
+        #Initiate data preprocessing script
+        #Cleaning df_city and df_fact
+        df_city_sel, df_fact_sel = perform_data_clean(df_city, df_fact)
+
+        #Validation for df_city and df_fact
+        df_top10_rec(df_city_sel, "df_city_sel")
+        df_top10_rec(df_fact_sel, "df_fact_sel")
+        df_print_schema(df_fact_sel, "df_fact_sel")
 
         logging.info("run_pipeline.py is Completed")
 

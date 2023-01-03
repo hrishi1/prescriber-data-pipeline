@@ -4,7 +4,7 @@ import logging.config
 
 #Load the logging config file and create a customer logger for current module
 logging.config.fileConfig(fname='../util/logging_to_file.conf')
-logger = logging.getLogger(__name__) #__name__ gives use the name of current module (validations)
+logger = logging.getLogger(__name__) #__name__ gives us the name of current module (validations)
 
 
 def get_curr_date(spark):
@@ -49,3 +49,17 @@ def df_top10_rec(df,dfName):
         raise
     else:
         logger.info("Data frame validation by top 10 records completed.")
+
+def df_print_schema(df,dfName):
+    try:
+        logger.info(f"The Dataframe Schema validation for {dfName}...")
+        sch = df.schema.fields
+        logger.info(f"The dataframe schema for {dfName} is: ")
+        for i in sch:
+            logger.info(f"\t{i}")
+
+    except Exception as exp:
+        logger.error("Error in method df_print_schema(): "+str(exp))
+        raise
+    else:
+        logger.info("Dataframe schema validation completed.")

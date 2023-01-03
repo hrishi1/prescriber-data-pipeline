@@ -4,7 +4,7 @@ import logging.config
 
 #Load the logging config file and create a customer logger for current module
 logging.config.fileConfig(fname='../util/logging_to_file.conf')
-logger = logging.getLogger(__name__) #__name__ gives use the name of current module (create_objects)
+logger = logging.getLogger(__name__) #__name__ gives the name of current module (create_objects)
 
 def get_spark_object(envn, appName):
     try:
